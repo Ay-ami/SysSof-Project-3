@@ -27,6 +27,22 @@ int sizeOfSymbolTable = 1; // size of the symbol table currently, not the max si
                            // is no match when we search
 struct symbol symbolTable [100];
 
+// really only prototyping them so that the warnings go shhhhhh
+void emit(int op, int level, int address);
+void error(int errorType);
+void statement();
+void expression();
+void term();
+void factor();
+void condition();
+int countTokens();
+void getToken();
+int checkTable(struct token token, int kind);
+void markVar( struct token token );
+void block();
+void printSymbolTable();
+
+
 
 //----->here is some stuff for the code generation part of the project<-----//
 typedef enum {
