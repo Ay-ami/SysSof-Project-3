@@ -328,7 +328,7 @@ void tokenizer(char *codeArr)
             j++;
             continue;
           }
-        case (int) 'p':
+        /*case (int) 'p':
 
           if(codeArr[i+1]=='r' &&codeArr[i+2] == 'o' &&codeArr[i+3] == 'c' &&codeArr[i+4] == 'e' &&codeArr[i+5] == 'd' &&codeArr[i+6] == 'u' &&codeArr[i+7] == 'r' &&codeArr[i+8] == 'e' && !(codeArr[i+9]>='a' && codeArr[i+9]<='z') && !(codeArr[i+9]>='A'&&codeArr[i+9]<='Z')){
 
@@ -337,7 +337,7 @@ void tokenizer(char *codeArr)
             tokenStorage[j] = currToken;
             j++;
             continue;
-          }
+          }*/
         case (int) 'r':
 
           if(codeArr[i+1] == 'e' &&codeArr[i+2] == 'a' &&codeArr[i+3] == 'd' && !(codeArr[i+4]>='a' && codeArr[i+4]<='z') && !(codeArr[i+4]>='A'&&codeArr[i+4]<='Z')){
