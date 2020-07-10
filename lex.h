@@ -22,11 +22,11 @@ A period is used to indicate the end of the definition of a syntactic class.
 #define MAX_DIGITS 5
 #define MAX_ID_LENGTH 11
 
-//                            0       1         2          3      4     5       6        7      8       9      10      11
-char * RESERVED_WORDS[] = {"const", "var", "procedure", "call", "if", "then", "else", "while", "do", "read", "write", "odd"};
+//                            0       1         2          3      4     5       6        7      8       9      10      11       12      13
+char * RESERVED_WORDS[] = {"const", "var", "procedure", "call", "if", "then", "else", "while", "do", "read", "write", "odd", "begin", "end"};
 char SPECIAL_SYMBOLS[] = {'+', '-', '*', '/', '(' , ')', '=', ',' , '.', '<', '>',  ';' , ':' };
 char *LITERAL_ID[] = {"", " ", "id", "number", "+", "-", "*", "/", "odd", "=", "<>", "<", "<=", ">", ">=",
-"(", ")", ",", ";", ".", ":=", "{", "}", "if", "then", "while", "do", "call", "const", "var", "procedure",
+"(", ")", ",", ";", ".", ":=", "begin", "end", "if", "then", "while", "do", "call", "const", "var", "procedure",
 "write", "read", "else", ":"};
 
 typedef enum {
@@ -141,10 +141,6 @@ int symbolToToken(char symbol){ //exchanges char for token ident tag
             return periodsym;
         case (int) ':':
             return colonsym;
-        case (int) '{':
-            return beginsym;
-        case (int) '}':
-            return endsym;
         default:
             return 0;
     }
@@ -223,15 +219,32 @@ void tokenizer(char *codeArr)
     if(codeArr[i] >= 'a' && codeArr[i] <= 'z'){
 
       switch((int) codeArr[i]){
+      case (int) 'b':
+        if(codeArr[i+1] == 'e' && codeArr[i+2] == 'g' && codeArr[i+3] == 'i' && codeArr[i+4] == 'n' && !(codeArr[i+5]>='a' && codeArr[i+5]<='z') && !(codeArr[i+5]>='A' && codeArr[i+5]<='Z'))
+        {
+            i = i + 5;
+            currToken.ID = beginsym;
+            tokenStorage[j]=currToken;
+            j++;
+            continue;
+        }
 
         case (int) 'e':
 
-          if(codeArr[i+1] == 'l' && codeArr[i+2] == 's' && codeArr[i+3] == 'e'){
-            i = i + 3;
+          if(codeArr[i+1] == 'l' && codeArr[i+2] == 's' && codeArr[i+3] == 'e' && !(codeArr[i+4]>='a' && codeArr[i+4]<='z') && !(codeArr[i+4]>='A' && codeArr[i+4]<='Z')){
+            i = i + 4;
             currToken.ID = elsesym;
             tokenStorage[j] = currToken;
             j++;
             continue;
+          }
+          else if(codeArr[i+1]=='n' && codeArr[i+2]=='d' && !(codeArr[i+3]>='a' && codeArr[i+3]<='z') && !(codeArr[i+3]>='A' && codeArr[i+3]<='Z'))
+          {
+              i = i + 3;
+              currToken.ID = endsym;
+              tokenStorage[j] = currToken;
+              j++;
+              continue;
           }
         case (int) 'i':
 
@@ -522,7 +535,7 @@ int lex()
     //lexemeTable(fpw, tokenStorage);
 
     // print lexeme list
-    //lexemeList(fpw, tokenStorage);
+    lexemeList(fpw, tokenStorage);
 
 
     fclose(fp);

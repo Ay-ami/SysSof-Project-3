@@ -19,7 +19,7 @@ struct symbol
 	int value; 		// number (ASCII value). was "val". idk what it means by it has to be an ascii value its already a number
 	int level; 		// L level, in this project will basically always be 0
 	int address; 		// M address. was "addr"
-	int mark;		// to indicate unavailable or delete d
+	int mark;		// to indicate unavailable or deleted
 }symbol;
 int currAddress=4; // addresses here start at 4 in this project because we have 3 things in the AR already
 int sizeOfSymbolTable = 1; // size of the symbol table currently, not the max size that's gonna be like 100 or something
@@ -95,13 +95,13 @@ readsym = 32, elsesym = 33, colonsym = 34
 */
 int numTokens; //probably need to run the token struct through a function that does counter++ until it hits ID=0 to get this number
 int tokenIndex = 0; // this is the index for the token struct
-struct token tokens[100]; //100 for now...
+//struct token tokens[100]; //100 for now... changed all referances to "token" to "tokenStorage" from lex.h
 struct token currToken;
 
 int countTokens()
 {
     int count = 0;
-    for ( int i = 0 ; tokens[i].ID != 0; i++ )
+    for ( int i = 0 ; tokenStorage[i].ID != 0; i++ )
     {
         count++;
     }
@@ -114,9 +114,9 @@ void getToken()
         error(1); // no more tokens to get
     else
     {
-        currToken.ID = tokens[tokenIndex].ID;
-        currToken.value = tokens[tokenIndex].value;
-        strcpy(currToken.name, tokens[tokenIndex].name);
+        currToken.ID = tokenStorage[tokenIndex].ID;
+        currToken.value = tokenStorage[tokenIndex].value;
+        strcpy(currToken.name, tokenStorage[tokenIndex].name);
 
         tokenIndex++;
     }
@@ -145,6 +145,19 @@ int checkTable(struct token token, int kind)
         }
     }
     return 0; // no match has been found
+}
+
+// instead of "deleting" things from the table, we mark them
+void markVar( struct token token )
+{
+    int index = checkTable( token, 2 );
+    if ( index == 0 )
+        error(12); //undeclared identifier
+    else
+    {
+        symbolTable[index].mark = 1;
+    }
+
 }
 void error(int errorType) // this should probably be the last thing we fill out
 {
@@ -380,7 +393,7 @@ void statement()
     // constant declarations, variable declarations, and a statement at the same time
     int ID = currToken.ID;
     int cx1, cx2;
-    int checkedTableIndex;
+    int checkedTableIndex; //when we use checkTable() save the index
 
     switch (ID)
     {
@@ -407,6 +420,8 @@ void statement()
             {
                 error(14); // Assignment operator expected.
             }
+
+            //symbolTable[checkTable(currToken, 2)].value = currToken.value;//?/////????//////////??////////??//////
 
             // if it is the becomes symbol, we can move on
             getToken();
@@ -473,7 +488,7 @@ void statement()
             emit(JPC, 0,0);
 
             // the next token must be do
-            if (token.ID != dosym)
+            if (currToken.ID != dosym)
             {
                 error(19);// do expected
             }
@@ -507,7 +522,7 @@ void statement()
             {
                 checkedTableIndex = checkTable(token, 2);
             }
-            // emit(STO, );
+            emit(STO, 0, symbolTable[checkedTableIndex].address); // i think this one's ok? again, L might not have to be 0
 
             getToken();
             break;
@@ -783,7 +798,8 @@ int main()
 
     length: 15 (14 tokens + 1 ID=0)
     */
-
+    lex();
+    /*
     tokens[0].ID = 29;
     tokens[1].ID = 2;
     strcpy(tokens[1].name, "a");
@@ -803,6 +819,7 @@ int main()
     tokens[12].ID = 22;
     //tokens[13].ID = 19;
     tokens[13].ID = 0;
+    */
 
     numTokens = countTokens();
     printf("numtokens: %d\n", numTokens);
