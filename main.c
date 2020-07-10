@@ -147,6 +147,39 @@ int checkTable(struct token token, int kind)
     return 0; // no match has been found
 }
 
+void insertNewSymbol(struct token token, int kind)
+{
+    /*
+
+    int kind; 		// const = 1, var = 2, proc = 3
+    char name[10];	// name up to 11 chars
+	int value; 		// number (ASCII value). was "val". idk what it means by it has to be an ascii value its already a number
+	int level; 		// L level, in this project will basically always be 0
+	int address; 		// M address. was "addr"
+	int mark;
+
+    */
+
+    symbolTable[sizeOfSymbolTable].kind = kind;
+    strcpy( symbolTable[sizeOfSymbolTable].name, token.name );
+    symbolTable[sizeOfSymbolTable].value = 0; // 0 is only a defult value, the actual value gets added separately
+    symbolTable[sizeOfSymbolTable].level = currLevel; //pretty much always 0 so who cares
+    symbolTable[sizeOfSymbolTable].mark = 0;
+
+    if (kind == 2)
+    {
+        symbolTable[sizeOfSymbolTable].address = currAddress;
+        currAddress++;
+    }
+    else
+    {
+        symbolTable[sizeOfSymbolTable].address = 0;
+    }
+
+   // sizeOfSymbolTable++; no we do this only after we add a value
+
+}
+
 // instead of "deleting" things from the table, we mark them
 void markVar( struct token token )
 {
@@ -290,11 +323,14 @@ void block()
             else
             {
                 // this is a new identifier!
+                /* this block is all handled by insertNewSymbol()
                 strcpy( symbolTable[sizeOfSymbolTable].name, currToken.name );
                 symbolTable[sizeOfSymbolTable].kind = 1; // (kind 1 = const)
                 symbolTable[sizeOfSymbolTable].level = 0;
                 symbolTable[sizeOfSymbolTable].mark = 0;
                 symbolTable[sizeOfSymbolTable].address = 0;
+                */
+                insertNewSymbol(currToken, 1);
             }
 
             // ok now that the table knows the name of this identifier, we update token again
@@ -315,14 +351,13 @@ void block()
                 error(3); // "= must be followed by a number."
             }
             // if it is a digit, we can input our new const's value into the symbol table
+            printf("numsym value: %d\n", currToken.value);
             symbolTable[sizeOfSymbolTable].value = currToken.value;
-            // there is no level, address, or mark to store in the symbol table for this one so
-            symbolTable[sizeOfSymbolTable].level = 0;
-            symbolTable[sizeOfSymbolTable].mark = 0;
-            symbolTable[sizeOfSymbolTable].address = 0;
+            printf("value inserted in table: %d\n", symbolTable[sizeOfSymbolTable].value);
 
             // we can just go ahead and officially say the symbol table is bigger
-            sizeOfSymbolTable++;
+             sizeOfSymbolTable++;
+
 
             // ok, next token
             getToken();
@@ -355,6 +390,7 @@ void block()
                 error(27); // duplicate identifier name
             }
             // if no variable with that name exists, we add it to the table:
+            /* **this is now handled by insertNewSymbol**
             strcpy( symbolTable[sizeOfSymbolTable].name, currToken.name );
             symbolTable[sizeOfSymbolTable].kind = 2; // (kind 2 = variable)
             symbolTable[sizeOfSymbolTable].address = currAddress;
@@ -362,7 +398,8 @@ void block()
             // there is no value to input just yet, there is no level to input, no mark either so
             symbolTable[sizeOfSymbolTable].level = 0;
             symbolTable[sizeOfSymbolTable].mark = 0;
-
+            */
+            insertNewSymbol(currToken, 2);
             // we can officially grow the symbol table
             sizeOfSymbolTable++;
             // we can move on

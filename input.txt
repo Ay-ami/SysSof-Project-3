@@ -1,4 +1,6 @@
+const f = 3;
 var x, squ;
+const f = 3;
 
 begin
     x := 2;

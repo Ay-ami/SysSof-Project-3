@@ -231,14 +231,14 @@ void tokenizer(char *codeArr)
 
         case (int) 'e':
 
-          if(codeArr[i+1] == 'l' && codeArr[i+2] == 's' && codeArr[i+3] == 'e' && !(codeArr[i+4]>='a' && codeArr[i+4]<='z') && !(codeArr[i+4]>='A' && codeArr[i+4]<='Z')){
+          /*if(codeArr[i+1] == 'l' && codeArr[i+2] == 's' && codeArr[i+3] == 'e' && !(codeArr[i+4]>='a' && codeArr[i+4]<='z') && !(codeArr[i+4]>='A' && codeArr[i+4]<='Z')){
             i = i + 4;
             currToken.ID = elsesym;
             tokenStorage[j] = currToken;
             j++;
             continue;
           }
-          else if(codeArr[i+1]=='n' && codeArr[i+2]=='d' && !(codeArr[i+3]>='a' && codeArr[i+3]<='z') && !(codeArr[i+3]>='A' && codeArr[i+3]<='Z'))
+          else */if(codeArr[i+1]=='n' && codeArr[i+2]=='d' && !(codeArr[i+3]>='a' && codeArr[i+3]<='z') && !(codeArr[i+3]>='A' && codeArr[i+3]<='Z'))
           {
               i = i + 3;
               currToken.ID = endsym;
@@ -294,7 +294,7 @@ void tokenizer(char *codeArr)
           }
         case (int) 'c':
 
-          if(codeArr[i+1]=='a'&&codeArr[i+2]=='l' && codeArr[i+3]=='l' && !(codeArr[i+4]>='a' && codeArr[i+4]<='z') && !(codeArr[i+4]>='A'&&codeArr[i+4]<='Z')){
+          /*if(codeArr[i+1]=='a'&&codeArr[i+2]=='l' && codeArr[i+3]=='l' && !(codeArr[i+4]>='a' && codeArr[i+4]<='z') && !(codeArr[i+4]>='A'&&codeArr[i+4]<='Z')){
 
             i = i + 4;
             currToken.ID = callsym;
@@ -302,7 +302,7 @@ void tokenizer(char *codeArr)
             j++;
             continue;
 
-          }else if(codeArr[i+1] == 'o' && codeArr[i+2] == 'n' && codeArr[i+3] == 's'  && codeArr[i+4] =='t'&& !(codeArr[i+5]>='a' && codeArr[i+5]<='z') && !(codeArr[i+5]>='A'&&codeArr[i+5]<='Z')){
+          }else*/ if(codeArr[i+1] == 'o' && codeArr[i+2] == 'n' && codeArr[i+3] == 's'  && codeArr[i+4] =='t'&& !(codeArr[i+5]>='a' && codeArr[i+5]<='z') && !(codeArr[i+5]>='A'&&codeArr[i+5]<='Z')){
 
             i = i + 5;
             currToken.ID = constsym;
@@ -532,7 +532,7 @@ int lex()
     tokenizer(codeArr);
 
     // print lexeme table
-    //lexemeTable(fpw, tokenStorage);
+    lexemeTable(fpw, tokenStorage);
 
     // print lexeme list
     lexemeList(fpw, tokenStorage);
