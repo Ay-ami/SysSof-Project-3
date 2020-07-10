@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include "lex.h"
 // HW2 ->  HW3  ->  HW1
 // LEX    parser    VM  ?
 // this might need another step somewhere
@@ -67,6 +67,7 @@ void emit(int op, int level, int address)
 //---->end of stuff for code generation part of the project<----//
 
 //---->stuff from project 2<----//
+/*
 #define MAX_DIGITS 5
 #define MAX_ID_LENGTH 11
 struct token{
@@ -91,7 +92,7 @@ readsym = 32, elsesym = 33, colonsym = 34
 }token_type;
 
 //----->end of stuff from project 2<-----//
-
+*/
 int numTokens; //probably need to run the token struct through a function that does counter++ until it hits ID=0 to get this number
 int tokenIndex = 0; // this is the index for the token struct
 struct token tokens[100]; //100 for now...
@@ -810,4 +811,5 @@ int main()
     block();
 
     printSymbolTable();
+    printf("\nglobal test fire: %d\n", globalTestFire);
 }
