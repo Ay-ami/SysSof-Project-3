@@ -1,0 +1,7 @@
+const call = 20;
+var p, h, q;
+begin
+    p := 4;
+    h := 3;
+    q := call - h;
+end.
