@@ -162,7 +162,7 @@ void insertNewSymbol(struct token token, int kind)
 
     symbolTable[sizeOfSymbolTable].kind = kind;
     strcpy( symbolTable[sizeOfSymbolTable].name, token.name );
-    symbolTable[sizeOfSymbolTable].value = 0; // 0 is only a defult value, the actual value gets added separately
+    symbolTable[sizeOfSymbolTable].value = 0; // 0 is only a defult value, the actual value gets added separately (const only!)
     symbolTable[sizeOfSymbolTable].level = currLevel; //pretty much always 0 so who cares
     symbolTable[sizeOfSymbolTable].mark = 0;
 
@@ -351,9 +351,7 @@ void block()
                 error(3); // "= must be followed by a number."
             }
             // if it is a digit, we can input our new const's value into the symbol table
-            printf("numsym value: %d\n", currToken.value);
             symbolTable[sizeOfSymbolTable].value = currToken.value;
-            printf("value inserted in table: %d\n", symbolTable[sizeOfSymbolTable].value);
 
             // we can just go ahead and officially say the symbol table is bigger
              sizeOfSymbolTable++;
