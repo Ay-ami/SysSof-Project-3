@@ -1,7 +1,7 @@
-const call = 20;
-var p, h, q;
+var procedure, b, c;
 begin
-    p := 4;
-    h := 3;
-    q := call - h;
+    read procedure;
+    read b;
+    c := procedure + b;
+    write c;
 end.
