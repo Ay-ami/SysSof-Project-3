@@ -21,7 +21,7 @@ struct symbol
 	int address; 		// M address. was "addr"
 	int mark;		// to indicate unavailable or deleted
 }symbol;
-int currAddress=4; // addresses here start at 4 in this project because we have 3 things in the AR already
+int currAddress=3; // addresses here start at 4 in this project because we have 3 things in the AR already
 int sizeOfSymbolTable = 1; // size of the symbol table currently, not the max size that's gonna be like 100 or something
                            // it starts at 1 because symbolTable starts at 1, if we ever hit symbolTable[0] that means there
                            // is no match when we search
@@ -79,6 +79,7 @@ void emit(int op, int level, int address)
 
         currentCodeIndex++;
     }
+    printf(" emit ( %d, %d, %d )  \n", op, level, address);
 }
 //---->end of stuff for code generation part of the project<----//
 
@@ -178,18 +179,20 @@ void insertNewSymbol(struct token token, int kind)
 
     symbolTable[sizeOfSymbolTable].kind = kind;
     strcpy( symbolTable[sizeOfSymbolTable].name, token.name );
-    symbolTable[sizeOfSymbolTable].value = 0; // 0 is only a defult value, the actual value gets added separately (const only!)
+    symbolTable[sizeOfSymbolTable].value = -1; // -1 is only a defult value, the actual value gets added separately (const only!)
     symbolTable[sizeOfSymbolTable].level = currLevel; //pretty much always 0 so who cares
     symbolTable[sizeOfSymbolTable].mark = 0;
 
     if (kind == 2)
     {
-        symbolTable[sizeOfSymbolTable].address = currAddress;
-        currAddress++;
+        symbolTable[sizeOfSymbolTable].address = currAddress + 1; // currAddress starts at the reserved 3, so the first open space is 1 after that
+        currAddress++;                                            // the reason we don't just start currAddress at 4 is because if we need to access
+                                                                  // it somewhere else outside of this function it might be 1 address ahead
+        printf("  current address of symbol table is now: %d\n", currAddress);
     }
     else
     {
-        symbolTable[sizeOfSymbolTable].address = 0;
+        symbolTable[sizeOfSymbolTable].address = -1; // -1 is only a defult value because non-vars don't get addresses
     }
 
    // sizeOfSymbolTable++; no we do this only after we add a value
@@ -301,6 +304,13 @@ void error(int errorType) // this should probably be the last thing we fill out
             break;
         case 30:
             printf("there are no more tokens to read\n");
+            break;
+        case 31:
+            printf("cannot declare and initialize a var at the same time\n");
+            break;
+        case 32:
+            printf("use := instead of =\n");
+            break;
         default:
             printf("default error\n");
             break;
@@ -406,21 +416,18 @@ void block()
                 error(27); // duplicate identifier name
             }
             // if no variable with that name exists, we add it to the table:
-            /* **this is now handled by insertNewSymbol**
-            strcpy( symbolTable[sizeOfSymbolTable].name, currToken.name );
-            symbolTable[sizeOfSymbolTable].kind = 2; // (kind 2 = variable)
-            symbolTable[sizeOfSymbolTable].address = currAddress;
-            currAddress++; // increment current address
-            // there is no value to input just yet, there is no level to input, no mark either so
-            symbolTable[sizeOfSymbolTable].level = 0;
-            symbolTable[sizeOfSymbolTable].mark = 0;
-            */
+
             insertNewSymbol(currToken, 2);
             // we can officially grow the symbol table
             sizeOfSymbolTable++;
+
             // we can move on
             getToken();
-
+            // also we cannot have a = after the identifier because we do not declare and initialize variables at the same time
+            if (currToken.ID == eqsym)
+            {
+                error(31);// cannot initialize var at this time
+            }
         }
         while (currToken.ID == commasym);// similarly to above, there could be multiple variables declared
         if ( currToken.ID != semicolonsym )// variable declarations *have* to end with a semicolon
@@ -471,6 +478,10 @@ void statement()
             getToken();
 
             // the following token must be the becomes symbol (":=")
+            if (currToken.ID == eqsym)
+            {
+                error(32); //oh no, should use := here not just =
+            }
             if ( currToken.ID != becomessym )
             {
                 error(14); // Assignment operator expected.
@@ -555,8 +566,8 @@ void statement()
 
             getToken();
             statement();
-            //emit(JMP, 0, saveIndex1);??
-            //code[cx2].m;// = whatever the hell "code_index" is;
+            emit(JMP, 0, saveIndex1); // perhaps emit saveIndex1?
+            Code[saveIndex2].M = currentCodeIndex; //still not sure about this
             break;
 
         case readsym:
@@ -574,7 +585,6 @@ void statement()
             {
                 error(12); // "undeclared identifier!"
             }
-            emit(SIO2, 0, 2); // there are 3 STOs and they're basically seperated by their  M  so that's why there's just a 2 here
 
             // checks if a const identifier with this name exists
             checkedTableIndex = checkTable(token, 1);
@@ -582,6 +592,8 @@ void statement()
             {
                 checkedTableIndex = checkTable(token, 2);
             }
+            // read emit
+            emit(SIO2, 0, 2); // there are 3 STOs and they're basically seperated by their  M  so that's why there's just a 2 here
             emit(STO, 0, symbolTable[checkedTableIndex].address); // i think this one's ok? again, L might not have to be 0
 
             getToken();
@@ -612,7 +624,8 @@ void statement()
             else{ // or else it is a var not a cnost
                 emit(LOD, 0, symbolTable[checkTable(token, 2)].address); // maybe the L isnt really a 0 but eeeee
             }
-
+            // STO1 is write
+            emit(SIO1, 0, 1);
             // finally update token
             getToken();
 
@@ -664,15 +677,13 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
         else{
             emit(OPR, 0, SUB);
         }
-
     }
-
 
 }
 
 void term()
 {
-     printf("in term\n");
+    printf("in term\n");
     int saveType; // save if it was multiply or divide
     // terms start with a factor
     factor();
@@ -689,7 +700,6 @@ void term()
             emit(OPR, 0, MUL);
         if (saveType == slashsym)
             emit(OPR, 0, DIV);
-
     }
 
 }
@@ -703,25 +713,27 @@ void factor() // ident | number | "(" expression ")"
     {
         case identsym://; // there is a ; here because the following line is a declaration and that makes it funky
             printf("in identsym (in factor) %s\n", currToken.name);
-            int check = checkTable(currToken, 2); // check using kind=2 first
-            if (check == 0) // if a variable identifier with that name doesn't exist, check if a constant does
-                check = checkTable(currToken, 1);
-            if (check == 0) // if it *still* isn't in the table
+
+            int checkedTableIndex = checkTable(currToken, 2); // check using kind=2 first
+            if (checkedTableIndex == 0) // if a variable identifier with that name doesn't exist, check if a constant does
+                checkedTableIndex = checkTable(currToken, 1);
+            if (checkedTableIndex == 0) // if it *still* isn't in the table
                 error(12); // "Undeclared identifier"
 
-            if (symbolTable[check].kind == 2) // if it's a variable
+            if (symbolTable[checkedTableIndex].kind == 2) // if it's a variable
             {
-                emit(LOD, 0, symbolTable[check].address); // assumes level is always 0, might have to fix this
+                emit(LOD, 0, symbolTable[checkedTableIndex].address); // assumes level is always 0, might have to fix this
             }
-            if (symbolTable[check].kind == 1) // if it's a constant
+            if (symbolTable[checkedTableIndex].kind == 1) // if it's a constant
             {
-                emit(LIT, 0, symbolTable[check].value); // assumes level is always 0, might have to fix this
+                emit(LIT, 0, symbolTable[checkedTableIndex].value); // assumes level is always 0, might have to fix this
             }
             break;
 
         case numbersym:
             printf("in numsym\n");
             emit(LIT, 0, currToken.value);
+            getToken();
             break;
 
         case lparentsym: // this is the "(" expression ")" part
@@ -810,6 +822,16 @@ void printSymbolTable()
 
     }
 }
+void printCodeArray()
+{
+    for (int i = 0; i<currentCodeIndex ; i++)
+    {
+        printf("OP: %d\n", Code[i].OP);
+        printf("L: %d\n", Code[i].L);
+        printf("M: %d\n\n", Code[i].M);
+    }
+
+}
 int main()
 {
     /*
@@ -890,6 +912,7 @@ int main()
     block();
 
     printSymbolTable();
+    printCodeArray();
 
     printf("\nglobal test fire: %d\n", globalTestFire);
 }

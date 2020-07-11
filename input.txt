@@ -1,9 +1,8 @@
-const f = 3;
-var x, squ;
-const f = 3;
-
+const mHouse = 99;
+var procedure, b, c, p;
 begin
-    x := 2;
-    while x <= 10 do
-            x := x + 1;
+    read procedure;
+    read b;
+    c := procedure + b;
+    read c;
 end.
