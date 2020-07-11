@@ -127,7 +127,7 @@ void getToken()
 {
     printf("  getToken() %d\n", currToken.ID);
     if ( tokenIndex == numTokens )
-        error(1); // no more tokens to get
+        error(30); // no more tokens to get
     else
     {
         currToken.ID = tokenStorage[tokenIndex].ID;
@@ -213,7 +213,7 @@ void error(int errorType) // this should probably be the last thing we fill out
     switch (errorType)
     {
         case 1:
-            printf("there was an error\n");
+            printf("error 1 there was an error\n");
             break;
         case 2:
             printf("Use = instead of :=\n");
@@ -299,6 +299,8 @@ void error(int errorType) // this should probably be the last thing we fill out
         case 29:
             printf("write must be followed by identifier\n");
             break;
+        case 30:
+            printf("there are no more tokens to read\n");
         default:
             printf("default error\n");
             break;
@@ -430,9 +432,11 @@ void block()
     }//end of varsym
 
     // after const and vars, we increment the stack pointer depending on how many vars we put i think?
-    emit(INC, 0, currAddress);
+    emit(INC, 0, currAddress);// TA: "emit(INC, , 4+numVars")
 
     statement();
+    getToken();
+    printf("end of block statement\n");
 }
 
 void statement()
@@ -443,7 +447,7 @@ void statement()
     // separates types of statements with an OR symbol ("|"). Unlike block() which can enter
     // constant declarations, variable declarations, and a statement at the same time
     int ID = currToken.ID;
-    int cx1, cx2;
+    int saveIndex1, saveIndex2;
     int checkedTableIndex; //when we use checkTable() save the index
 
     switch (ID)
@@ -480,7 +484,7 @@ void statement()
             // the following *must* be an expression
             expression();
 
-            // emit(STO, ,) here, not sure what goes into it
+            emit(STO, symbolTable[checkedTableIndex].level, symbolTable[checkedTableIndex].address); // maybe it's this?? dan's is currentLevel-symbolTable[].L
 
             break;
 
@@ -514,28 +518,33 @@ void statement()
             getToken();
 
             // we gotta store the current Code index
-            cx1 = currentCodeIndex; // i *think* "code_index" corresponds with our "currentCodeIndex"?
+            saveIndex1 = currentCodeIndex;
             emit(JPC, 0, 0); // JPC = "Jump to instruction M if top stack element is 0"
 
             // do the statement following "then"
             statement();
 
-            //save current code index again because who knows how much the statement() moved it
-            cx2 = currentCodeIndex;
+            // save current code index again because who knows how much the statement() moved it
+            saveIndex2 = currentCodeIndex;
 
             emit(JMP, 0, 0); // jump to instruction 0
-            Code[cx1].M = currentCodeIndex;
+
+            // hmmmmmmm these ones are weird, you're supposed to do something with the saved indexes of course but
+            // is this it?
+            Code[saveIndex1].M = currentCodeIndex;
             // there is no "else" for this project
-            Code[cx2].M = currentCodeIndex;
+            Code[saveIndex2].M = currentCodeIndex;
 
             break;
 
         case whilesym:
             printf("in whilesym \n");
-            // -->save jump location for the top<--
             getToken();
+            // save jump location for the top
+            saveIndex1 = currentCodeIndex;
             condition();
-            // -->save jump location for the end <--
+            // save jump location for the end
+            saveIndex2 = currentCodeIndex;
             emit(JPC, 0,0);
 
             // the next token must be do
@@ -546,7 +555,7 @@ void statement()
 
             getToken();
             statement();
-            emit(JMP, 0, cx1);
+            //emit(JMP, 0, saveIndex1);??
             //code[cx2].m;// = whatever the hell "code_index" is;
             break;
 
@@ -611,6 +620,8 @@ void statement()
 
         case endsym:
             printf("in endsym\n");
+            if ( tokenIndex == numTokens )
+                error(10); // period expected
             break;
 
 
@@ -879,5 +890,6 @@ int main()
     block();
 
     printSymbolTable();
+
     printf("\nglobal test fire: %d\n", globalTestFire);
 }
