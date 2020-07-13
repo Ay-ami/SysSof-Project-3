@@ -55,6 +55,7 @@ typedef enum{ // for when op=2
     MOD = 7, EQL = 8, NEQ = 9, LSS = 10, LEQ = 11, GTR = 12, GEQ = 13
 }OPRCodes;
 // given default values from HW1
+/*
 #define MAX_DATA_STACK_HEIGHT 1000
 #define MAX_CODE_LENGTH 500
 //struct of instructions
@@ -64,7 +65,7 @@ struct instruct{
     int  L; // L lexigraphical level
     int  M; // M
 }instruct;
-
+*/
 struct instruct Code[MAX_CODE_LENGTH];
 int currentCodeIndex=0;
 int currLevel = 0;
@@ -447,6 +448,7 @@ void block()
     statement();
     getToken();
     printf("end of block statement\n");
+    emit(SIO3, 0, 3); //halt statement
 }
 
 void statement()
@@ -917,7 +919,7 @@ int main()
     printSymbolTable();
     printCodeArray();
 
-    vm(Code, currentCodeIndex+1);
+    vm(Code, currentCodeIndex);
 
 
     printf("\nglobal test fire: %d\n", globalTestFire);

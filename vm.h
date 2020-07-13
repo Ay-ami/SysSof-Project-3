@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lex.h"
 
 // given default values
 #define MAX_DATA_STACK_HEIGHT 1000
@@ -143,6 +144,7 @@ void printStack(int stack[], int SP, int BP, FILE *fp)
 }
 int vm(struct instruct Code[], int size)
 {
+    printf("\ninside vm.h\n");
     // CPU Register
     int SP = MAX_DATA_STACK_HEIGHT;
     int BP = SP - 1;
@@ -178,11 +180,19 @@ int vm(struct instruct Code[], int size)
     fprintf(fpw, "\t\t pc  bp  sp \tstack\n");
     fprintf(fpw, "Initial Values:  %2d %3d %4d\n ", 0, 999, 1000);
 
-
+    // test to see if Code[] moved over
+    for (int i = 0; i < size ; i++)
+        {
+            printf("OP: %d\n", Code[i].OP);
+            printf("L: %d\n", Code[i].L);
+            printf("M: %d\n\n", Code[i].M);
+        }
 
     int i = 0;
     while (halt != 0)
     {
+
+        //printf("inside while loop \n");
         IR = Code[PC];
         int lastPC = PC;
         PC++;
@@ -380,7 +390,6 @@ int vm(struct instruct Code[], int size)
         printStack(stack, SP, BP, fpw);
 
     }
-
 
 
 

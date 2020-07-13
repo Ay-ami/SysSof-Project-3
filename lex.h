@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "vm.h"
+
 // COP 3402
 // Project 2- Lexical Analyzer
 // Due 6/19/2020
