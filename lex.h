@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "vm.h"
 // COP 3402
 // Project 2- Lexical Analyzer
 // Due 6/19/2020
@@ -46,6 +47,7 @@ struct token{
 struct token tokenStorage[500];
 int globalTestFire = 3;
 // opens the file
+/*
 FILE *openFile(char fileName[], char mode[], FILE *fp)
 {
     fp=fopen(fileName, mode);
@@ -56,7 +58,7 @@ FILE *openFile(char fileName[], char mode[], FILE *fp)
     }
     return fp;
 }
-
+*/
  //print character by character and ignores comments
 void removeComments (FILE *fp, FILE *fpw, char *arr)
 {

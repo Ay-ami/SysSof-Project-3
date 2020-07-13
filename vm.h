@@ -1,3 +1,9 @@
+// COP 3402
+// Project 1- P Machine
+// Due 6/5/2020
+// Victor Torez
+// Maya Awad
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +19,7 @@ struct instruct{
 }instruct;
 
 // opens the file
+
 FILE *openFile(char fileName[], char mode[], FILE *fp)
 {
     fp=fopen(fileName, mode);
@@ -123,7 +130,7 @@ void printStack(int stack[], int SP, int BP, FILE *fp)
         if (i == BP && (BP != ( MAX_DATA_STACK_HEIGHT-1) ) )
         {
             fprintf(fp, "| ");
-            
+            //printf("| ");
             BP = BP-7; //assumes each Activation Record can hold 6 inputs
         }
         fprintf(fp, "%d ", stack[i]);
@@ -132,7 +139,7 @@ void printStack(int stack[], int SP, int BP, FILE *fp)
     //printf("\n");
     fprintf(fp, "\n ");
 }
-int machineMain()
+int vm(struct instruct Code[], int size)
 {
     // CPU Register
     int SP = MAX_DATA_STACK_HEIGHT;
@@ -141,6 +148,7 @@ int machineMain()
     int halt = 1;
     struct instruct IR; // holds a signular struct from Code
 
+    /*
     FILE *fp;
     fp=openFile("input.txt", "r", fp);// remember to keep "input.txt" in the same file as the main c file so that the compiler can find it
 
@@ -156,13 +164,14 @@ int machineMain()
       fscanf(fp, "%d %d %d", &Code[count].OP, &Code[count].L, &Code[count].M); // "scan in 3 numbers per line"
       count++;
     }
-
+*/
     // print the first half of the output based on the now built Code array
     FILE *fpw = openFile("output.txt", "w", fpw);
-    printOutput1(Code, num, fpw);
+    printOutput1(Code, size, fpw); //num, fpw);
     //fclose(fp);
 
     int *stack = calloc(MAX_DATA_STACK_HEIGHT, sizeof(int));
+
 
     fprintf(fpw, "\t\t pc  bp  sp \tstack\n");
     fprintf(fpw, "Initial Values:  %2d %3d %4d\n ", 0, 999, 1000);

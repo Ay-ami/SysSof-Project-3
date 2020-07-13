@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "lex.h"
+#include "vm.h"
 // HW2 ->  HW3  ->  HW1
 // LEX    parser    VM  ?
 // this might need another step somewhere
@@ -57,11 +58,13 @@ typedef enum{ // for when op=2
 #define MAX_DATA_STACK_HEIGHT 1000
 #define MAX_CODE_LENGTH 500
 //struct of instructions
+
 struct instruct{
     int OP; // opcode
     int  L; // L lexigraphical level
     int  M; // M
 }instruct;
+
 struct instruct Code[MAX_CODE_LENGTH];
 int currentCodeIndex=0;
 int currLevel = 0;
@@ -913,6 +916,9 @@ int main()
 
     printSymbolTable();
     printCodeArray();
+
+    vm(Code, currentCodeIndex+1);
+
 
     printf("\nglobal test fire: %d\n", globalTestFire);
 }
