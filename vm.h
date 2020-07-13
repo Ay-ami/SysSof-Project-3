@@ -1,3 +1,5 @@
+#ifndef __VM_H
+#define __VM_H
 // COP 3402
 // Project 1- P Machine
 // Due 6/5/2020
@@ -19,7 +21,7 @@ struct instruct{
 }instruct;
 
 // opens the file
-
+/*
 FILE *openFile(char fileName[], char mode[], FILE *fp)
 {
     fp=fopen(fileName, mode);
@@ -31,7 +33,7 @@ FILE *openFile(char fileName[], char mode[], FILE *fp)
     //printf("file opened\n");
     return fp;
 }
-
+*/
 // returns the number of lines in the input file,
 int countLines(FILE *fp)
 {
@@ -384,3 +386,4 @@ int vm(struct instruct Code[], int size)
 
     return 0;
 }
+#endif // VM_H

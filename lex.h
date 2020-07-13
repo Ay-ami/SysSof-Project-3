@@ -1,3 +1,6 @@
+#ifndef __LEX_H
+#define __LEX_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +50,7 @@ struct token{
 struct token tokenStorage[500];
 int globalTestFire = 3;
 // opens the file
-/*
+
 FILE *openFile(char fileName[], char mode[], FILE *fp)
 {
     fp=fopen(fileName, mode);
@@ -58,7 +61,7 @@ FILE *openFile(char fileName[], char mode[], FILE *fp)
     }
     return fp;
 }
-*/
+
  //print character by character and ignores comments
 void removeComments (FILE *fp, FILE *fpw, char *arr)
 {
@@ -548,3 +551,4 @@ int lex()
 
     return 0;
 }
+#endif
