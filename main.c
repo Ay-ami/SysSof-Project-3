@@ -38,7 +38,7 @@ void factor();
 void condition();
 int countTokens();
 void getToken();
-int checkTable(struct token token, int kind);
+int checkTable(struct token token);
 void markVar( struct token token );
 void block();
 void printSymbolTable();
@@ -87,33 +87,7 @@ void emit(int op, int level, int address)
 }
 //---->end of stuff for code generation part of the project<----//
 
-//---->stuff from project 2<----//
-/*
-#define MAX_DIGITS 5
-#define MAX_ID_LENGTH 11
-struct token{
-    int ID;
-    int value;
-    char name[MAX_ID_LENGTH];
-}token;
 
-char * RESERVED_WORDS[] = {"const", "var", "procedure", "call", "if", "then", "else", "while", "do", "read", "write", "odd"};
-char SPECIAL_SYMBOLS[] = {'+', '-', '*', '/', '(' , ')', '=', ',' , '.', '<', '>',  ';' , ':' };
-char *LITERAL_ID[] = {"", " ", "id", "number", "+", "-", "*", "/", "odd", "=", "<>", "<", "<=", ">", ">=",
-"(", ")", ",", ";", ".", ":=", "{", "}", "if", "then", "while", "do", "call", "const", "var", "procedure",
-"write", "read", "else", ":"};
-
-typedef enum {
-nulsym = 1, identsym = 2, numbersym = 3, plussym = 4, minussym = 5,
-multsym = 6,  slashsym = 7, oddsym = 8, eqsym = 9, neqsym = 10, lessym = 11, leqsym = 12,
-gtrsym = 13, geqsym = 14, lparentsym = 15, rparentsym = 16, commasym = 17, semicolonsym = 18,
-periodsym = 19, becomessym = 20, lbracesym = 21, beginsym = 21, rbracesym = 22, endsym=22, ifsym = 23, thensym = 24,
-whilesym = 25, dosym = 26, callsym = 27, constsym = 28, varsym = 29, procsym = 30, writesym = 31,
-readsym = 32, elsesym = 33, colonsym = 34
-}token_type;
-
-//----->end of stuff from project 2<-----//
-*/
 int numTokens; //probably need to run the token struct through a function that does counter++ until it hits ID=0 to get this number
 int tokenIndex = 0; // this is the index for the token struct
 //struct token tokens[100]; //100 for now... changed all referances to "token" to "tokenStorage" from lex.h
@@ -143,25 +117,16 @@ void getToken()
     }
 }
 // searches if an identifier is in the symbol table already, returns index if match found
-int checkTable(struct token token, int kind)
+int checkTable(struct token token)
 {
     if (sizeOfSymbolTable == 1)
         return 0; // there isn't even anything in the table yet
-
-    if (kind == 2) // if var, the level must also at lest be equal or less than the current level
-    {
-         for (int i = sizeOfSymbolTable ; i > 0 ; i-- )
-        {
-            if ( strcmp(token.name, symbolTable[i].name) == 0 && symbolTable[i].level <= currLevel) // if a match is found
-            {
-                return i;
-            }
-        }
-    }
     for (int i = sizeOfSymbolTable ; i > 0 ; i-- )
     {
         if ( strcmp(token.name, symbolTable[i].name) == 0 ) // if a match is found
         {
+            printf("the search function thinks the %dth identifier in the table is %s based on the token of %s\n", i, symbolTable[i].name, token.name);
+
             return i;
         }
     }
@@ -170,16 +135,12 @@ int checkTable(struct token token, int kind)
 
 void insertNewSymbol(struct token token, int kind)
 {
-    /*
-
-    int kind; 		// const = 1, var = 2, proc = 3
+    /*int kind; 		// const = 1, var = 2, proc = 3
     char name[10];	// name up to 11 chars
 	int value; 		// number (ASCII value). was "val". idk what it means by it has to be an ascii value its already a number
 	int level; 		// L level, in this project will basically always be 0
 	int address; 		// M address. was "addr"
-	int mark;
-
-    */
+	int mark;*/
 
     symbolTable[sizeOfSymbolTable].kind = kind;
     strcpy( symbolTable[sizeOfSymbolTable].name, token.name );
@@ -189,9 +150,11 @@ void insertNewSymbol(struct token token, int kind)
 
     if (kind == 2)
     {
-        symbolTable[sizeOfSymbolTable].address = currAddress + 1; // currAddress starts at the reserved 3, so the first open space is 1 after that
-        currAddress++;                                            // the reason we don't just start currAddress at 4 is because if we need to access
-                                                                  // it somewhere else outside of this function it might be 1 address ahead
+        currAddress++;
+        symbolTable[sizeOfSymbolTable].address = currAddress;
+                                                              // the reason we don't just start currAddress at 4 is because if we need to access
+                                                            // it somewhere else outside of this function it might be 1 address ahead
+        printf("  the inserted var's adress is: %d\n", symbolTable[sizeOfSymbolTable].address);
         printf("  current address of symbol table is now: %d\n", currAddress);
     }
     else
@@ -206,7 +169,7 @@ void insertNewSymbol(struct token token, int kind)
 // instead of "deleting" things from the table, we mark them
 void markVar( struct token token )
 {
-    int index = checkTable( token, 2 );
+    int index = checkTable( token );
     if ( index == 0 )
         error(12); //undeclared identifier
     else
@@ -328,7 +291,7 @@ void block()
 
     printf("in block\n");
     // all the inputs from HW1 start with Jump to instruction 0
-    emit(JMP, 0, 0);
+    emit(JMP, 0, 1);
 
     // TA says "keep track of the number of variables"
     int numVars = 0;
@@ -348,7 +311,7 @@ void block()
 
             // checkTable will take in the current token and check it against the symbol table, returns index if it is found,
             // returns 0 if no match found
-            if ( checkTable(currToken, 1) != 0 )
+            if ( checkTable(currToken) != 0 )
             {
                  error(27); // duplicate identifier name
             }
@@ -415,7 +378,7 @@ void block()
                 error(5); // const, var, -procedure- must be followed by identifier
             }
             // if it is an identifier, we check if one such exists in the symbol table already
-            if ( checkTable(currToken, 2) != 0 )
+            if ( checkTable(currToken) != 0 )
             {
                 error(27); // duplicate identifier name
             }
@@ -468,7 +431,7 @@ void statement()
             // if it is an identifier symbol, check if one with this name exists
             printf("in identsym (in statement) %s\n", currToken.name);
 
-            checkedTableIndex = checkTable(currToken, 2);
+            checkedTableIndex = checkTable(currToken);
             if (checkedTableIndex == 0) // if checkTable returned a 0, then the identifier doesn't exist
             {
                 error(5); //"const, var, -procedure- must be followed by identifier"
@@ -500,8 +463,7 @@ void statement()
             // the following *must* be an expression
             expression();
 
-            emit(STO, symbolTable[checkedTableIndex].level, symbolTable[checkedTableIndex].address); // maybe it's this?? dan's is currentLevel-symbolTable[].L
-
+            emit(STO, 0, symbolTable[checkedTableIndex].address);
             break;
 
         case beginsym: // if "begin"
@@ -533,7 +495,7 @@ void statement()
             // if there is a "then", we can move on
             getToken();
 
-            // we gotta store the current Code index
+            // we gotta stostore the current Code index
             saveIndex1 = currentCodeIndex;
             emit(JPC, 0, 0); // JPC = "Jump to instruction M if top stack element is 0"
 
@@ -585,22 +547,18 @@ void statement()
                 error(28); // "read must be followed by identifier"
             }
 
+            checkedTableIndex = checkTable(currToken);
             // check if the identifier exists a a const or as a var
-            if (checkTable(currToken, 1) == 0 || checkTable(currToken, 2) == 0)
+            if ( checkedTableIndex == 0)
             {
                 error(12); // "undeclared identifier!"
             }
 
-            // checks if a const identifier with this name exists
-            checkedTableIndex = checkTable(token, 1);
-            if (checkedTableIndex == 0) // if no const with that name exists, try var
-            {
-                checkedTableIndex = checkTable(token, 2);
-            }
             // read emit
             emit(SIO2, 0, 2); // there are 3 STOs and they're basically seperated by their  M  so that's why there's just a 2 here
             emit(STO, 0, symbolTable[checkedTableIndex].address); // i think this one's ok? again, L might not have to be 0
 
+            // move on
             getToken();
             break;
 
@@ -614,20 +572,20 @@ void statement()
                 error(29); // "write must be followed by identifier"
             }
 
-            // check if the identifier exists a a const or as a var
-            if (checkTable(currToken, 1) == 0 || checkTable(currToken, 2) == 0)
+            // check if the identifier exists
+            checkedTableIndex = checkTable(currToken);
+            if (checkedTableIndex == 0)
             {
                 error(12); // "undeclared identifier!"
             }
 
             // checks if a const identifier with this name exists
-            checkedTableIndex = checkTable(token, 1);
-            if (checkedTableIndex != 0) // if it is indeed a const
+            if (symbolTable[checkedTableIndex].kind == 1) // if it is indeed a const
             {
                 emit(LIT, 0, currToken.value); // then we can emit it as a literal
             }
             else{ // or else it is a var not a cnost
-                emit(LOD, 0, symbolTable[checkTable(token, 2)].address); // maybe the L isnt really a 0 but eeeee
+                emit(LOD, 0, symbolTable[checkedTableIndex].address); // maybe the L isnt really a 0 but eeeee
             }
             // STO1 is write
             emit(SIO1, 0, 1);
@@ -719,10 +677,8 @@ void factor() // ident | number | "(" expression ")"
         case identsym://; // there is a ; here because the following line is a declaration and that makes it funky
             printf("in identsym (in factor) %s\n", currToken.name);
 
-            int checkedTableIndex = checkTable(currToken, 2); // check using kind=2 first
-            if (checkedTableIndex == 0) // if a variable identifier with that name doesn't exist, check if a constant does
-                checkedTableIndex = checkTable(currToken, 1);
-            if (checkedTableIndex == 0) // if it *still* isn't in the table
+            int checkedTableIndex = checkTable(currToken);
+            if (checkedTableIndex == 0) // if a variable identifier with that name doesn't exist, error
                 error(12); // "Undeclared identifier"
 
             if (symbolTable[checkedTableIndex].kind == 2) // if it's a variable
@@ -918,6 +874,8 @@ int main()
 
     printSymbolTable();
     printCodeArray();
+
+    printf("check table for procedure:  %d", symbolTable[checkTable(tokenStorage[7])].address);
 
     vm(Code, currentCodeIndex);
 
