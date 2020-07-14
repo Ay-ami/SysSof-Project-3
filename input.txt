@@ -1,8 +1,6 @@
 const mHouse = 99;
 var procedure, b, c, p;
 begin
-    read procedure;
-    read b;
-    c := procedure + b;
-    read c;
+   c := 4;
+   read b;
 end.

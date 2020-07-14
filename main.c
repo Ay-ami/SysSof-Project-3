@@ -432,7 +432,7 @@ void statement()
             printf("in identsym (in statement) %s\n", currToken.name);
 
             checkedTableIndex = checkTable(currToken);
-            if (checkedTableIndex == 0) // if checkTable returned a 0, then the identifier doesn't exist
+            if (checkedTableIndex == 0) // if checkTable returned a 0, if so, then the identifier doesn't exist
             {
                 error(5); //"const, var, -procedure- must be followed by identifier"
             }
