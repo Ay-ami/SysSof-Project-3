@@ -368,7 +368,6 @@ void block()
     if ( currToken.ID == varsym ) // check for a variable declaration
     {
         printf("in varsym\n");
-        numVars++;
         do
         {
             getToken();
@@ -395,6 +394,9 @@ void block()
             {
                 error(31);// cannot initialize var at this time
             }
+
+            // we can increment the number of variables now
+            numVars++;
         }
         while (currToken.ID == commasym);// similarly to above, there could be multiple variables declared
         if ( currToken.ID != semicolonsym )// variable declarations *have* to end with a semicolon
@@ -406,7 +408,7 @@ void block()
     }//end of varsym
 
     // after const and vars, we increment the stack pointer depending on how many vars we put i think?
-    emit(INC, 0, currAddress);// TA: "emit(INC, , 4+numVars")
+    emit(INC, 0, 4 + numVars);// TA: "emit(INC, , 4+numVars")
 
     statement();
     getToken();
@@ -674,7 +676,7 @@ void factor() // ident | number | "(" expression ")"
 
     switch (ID)
     {
-        case identsym://; // there is a ; here because the following line is a declaration and that makes it funky
+        case identsym:
             printf("in identsym (in factor) %s\n", currToken.name);
 
             int checkedTableIndex = checkTable(currToken);
