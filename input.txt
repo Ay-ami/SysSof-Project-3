@@ -2,5 +2,5 @@ const mHouse = 99;
 var procedure, b, c, p;
 begin
    c := 4;
-   read b;
+   b:= c+12;
 end.
