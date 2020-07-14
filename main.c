@@ -123,7 +123,7 @@ int checkTable(struct token token)
     {
         if ( strcmp(token.name, symbolTable[i].name) == 0 ) // if a match is found
         {
-            printf("the search function thinks the %dth identifier in the table is %s based on the token of %s\n", i, symbolTable[i].name, token.name);
+            //printf("the search function thinks the %dth identifier in the table is %s based on the token of %s\n", i, symbolTable[i].name, token.name);
 
             return i;
         }
@@ -629,6 +629,7 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
         term();
 
     // moving on, there can be another +/-
+    printf("this print statement is right before it checks if there is a plus or minus. the third time this shows up the current ID should be 4 for plussym.......    currToken.ID: %d\n", currToken.ID);
     while (currToken.ID == plussym || currToken.ID == minussym)
     {
         getToken();
