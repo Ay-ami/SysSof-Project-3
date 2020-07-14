@@ -276,6 +276,8 @@ void error(int errorType) // this should probably be the last thing we fill out
         case 32:
             printf("use := instead of =\n");
             break;
+        case 33: printf("expected + or -\n");
+            break;
         default:
             printf("default error\n");
             break;
@@ -431,6 +433,7 @@ void statement()
             // if it is an identifier symbol, check if one with this name exists
             printf("in identsym (in statement) %s\n", currToken.name);
 
+            // check if the identifier has been declared already
             checkedTableIndex = checkTable(currToken);
             if (checkedTableIndex == 0) // if checkTable returned a 0, if so, then the identifier doesn't exist
             {
@@ -464,6 +467,7 @@ void statement()
             expression();
 
             emit(STO, 0, symbolTable[checkedTableIndex].address);
+
             break;
 
         case beginsym: // if "begin"
@@ -479,6 +483,7 @@ void statement()
                 error(9); // all these statements must eventually end with "end"
                           // "Incorrect symbol after statement part in block"
             }
+            getToken();
             break;
 
         case ifsym:
@@ -599,37 +604,60 @@ void statement()
             if ( tokenIndex == numTokens )
                 error(10); // period expected
             break;
-
-
-    }
-
+    }//end of switch
+    statement();
 
 }//end statement
 
 void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
 {
     printf("in expression\n");
-
     int storeSign = plussym; // you probably don't need to initialize this but I am just in case
+    int checkedSymbolTable; // stores the result of checkTable()
+
     if (currToken.ID == plussym || currToken.ID == minussym) // "does this expression have that optional + or - at the beginning?"
     {
         storeSign = currToken.ID;
         getToken();
+        // following a starting sign, or just at the beginning, there must be a term
+        term();
+        // if we found that this term has a negative sign before it, we need to tell the VM to negate the term it just read
+        if (storeSign == minussym)
+            emit(OPR, 0, NEG); //if it has a minus sign out front, negate it
     }
-
-    // following a starting sign, or just at the beginning, there must be a term
-    term();
-    // if we found that this term has a negative sign before it, we need to tell the VM to negate the term it just read
-    if (storeSign == minussym)
-    {
-        emit(OPR, 0, NEG);
-    }
+    else // if theres no + or - then it's a regular term
+        term();
 
     // moving on, there can be another +/-
-    //getToken();
-
     while (currToken.ID == plussym || currToken.ID == minussym)
     {
+        getToken();
+        // if the next term is an identifier
+        if (currToken.ID == identsym)
+        {
+            checkedSymbolTable = checkTable(currToken);
+            if (checkedSymbolTable == 0)
+            {
+                error(12); //undeclared identifier
+            }
+            // we could check for kind here but there will never be a kind 3 so, moving on
+
+            // if it is a const we emit LIT, if it's var we emit LOD
+            if (symbolTable[checkedSymbolTable].kind == 1)
+            {
+                emit(LIT, 0, symbolTable[checkedSymbolTable].value);
+            }
+            else
+            {
+                emit(LOD, 0, symbolTable[checkedSymbolTable].address);
+            }
+
+            // move on
+            getToken();
+        }
+
+
+        // save if its + or - again
         storeSign = currToken.ID;
         getToken();
         term();
@@ -640,7 +668,7 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
         else{
             emit(OPR, 0, SUB);
         }
-    }
+    }// end of while
 
 }
 
@@ -671,13 +699,14 @@ void factor() // ident | number | "(" expression ")"
 {
     printf("in factor\n");
     int ID = currToken.ID;
+    int checkedTableIndex;
 
     switch (ID)
     {
         case identsym:
             printf("in identsym (in factor) %s\n", currToken.name);
 
-            int checkedTableIndex = checkTable(currToken);
+            checkedTableIndex = checkTable(currToken);
             if (checkedTableIndex == 0) // if a variable identifier with that name doesn't exist, error
                 error(12); // "Undeclared identifier"
 
@@ -689,10 +718,11 @@ void factor() // ident | number | "(" expression ")"
             {
                 emit(LIT, 0, symbolTable[checkedTableIndex].value); // assumes level is always 0, might have to fix this
             }
+            getToken();
             break;
 
         case numbersym:
-            printf("in numsym\n");
+            printf("in numbersym\n");
             emit(LIT, 0, currToken.value);
             getToken();
             break;
@@ -707,9 +737,11 @@ void factor() // ident | number | "(" expression ")"
             {
                 error(23); // "right parenthesis missing"
             }
+            getToken();
             break;
 
         default:
+            printf("default switch in factor\n");
             error(1); // oh oh it's not an identifier, number, or an expression enclosed in parenthesis
             break;
     }
