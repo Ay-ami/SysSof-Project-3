@@ -789,9 +789,13 @@ void printCodeArray()
 {
     for (int i = 0; i<currentCodeIndex ; i++)
     {
+        /*
         printf("OP: %d\n", Code[i].OP);
         printf("L: %d\n", Code[i].L);
         printf("M: %d\n\n", Code[i].M);
+        */
+
+        printf("%d %d %d\n", Code[i].OP, Code[i].L, Code[i].M);
     }
 
 }
