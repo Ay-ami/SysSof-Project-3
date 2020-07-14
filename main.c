@@ -66,9 +66,7 @@ struct instruct{
     int  M; // M
 }instruct;
 */
-struct instruct Code[MAX_CODE_LENGTH];
-int currentCodeIndex=0;
-int currLevel = 0;
+
 void emit(int op, int level, int address)
 {
     if (currentCodeIndex > MAX_CODE_LENGTH)
@@ -883,7 +881,7 @@ int main()
 
     printf("check table for procedure:  %d", symbolTable[checkTable(tokenStorage[7])].address);
 
-    vm(Code, currentCodeIndex);
+    vm();
 
 
     printf("\nglobal test fire: %d\n", globalTestFire);

@@ -20,7 +20,9 @@ struct instruct{
     int  L; // L lexigraphical level
     int  M; // M
 }instruct;
-
+struct instruct Code[MAX_CODE_LENGTH];
+int currentCodeIndex=0;
+int currLevel = 0;
 // opens the file
 /*
 FILE *openFile(char fileName[], char mode[], FILE *fp)
@@ -142,7 +144,7 @@ void printStack(int stack[], int SP, int BP, FILE *fp)
     //printf("\n");
     fprintf(fp, "\n ");
 }
-int vm(struct instruct Code[], int size)
+int vm()
 {
     printf("\ninside vm.h\n");
     // CPU Register
@@ -171,7 +173,7 @@ int vm(struct instruct Code[], int size)
 */
     // print the first half of the output based on the now built Code array
     FILE *fpw = openFile("output.txt", "w", fpw);
-    printOutput1(Code, size, fpw); //num, fpw);
+    printOutput1(Code, currentCodeIndex, fpw); //num, fpw);
     //fclose(fp);
 
     int *stack = calloc(MAX_DATA_STACK_HEIGHT, sizeof(int));
@@ -180,13 +182,6 @@ int vm(struct instruct Code[], int size)
     fprintf(fpw, "\t\t pc  bp  sp \tstack\n");
     fprintf(fpw, "Initial Values:  %2d %3d %4d\n ", 0, 999, 1000);
 
-    // test to see if Code[] moved over
-    for (int i = 0; i < size ; i++)
-        {
-            printf("OP: %d\n", Code[i].OP);
-            printf("L: %d\n", Code[i].L);
-            printf("M: %d\n\n", Code[i].M);
-        }
 
     int i = 0;
     while (halt != 0)
