@@ -1,7 +1,7 @@
-var procedure, b, c;
+const mHouse = 99;
+var procedure, b, c, p;
 begin
-    read procedure;
-    read b;
-    c := procedure + b;
-    write c;
-end.
+   c := 4;
+   b := 1;
+   p :=c+b;
+end

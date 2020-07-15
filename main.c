@@ -8,6 +8,12 @@
 // LEX    parser    VM  ?
 // this might need another step somewhere
 
+// COP 3402
+// Project 3- Parse Codegen
+// Due 7/14/2020
+// Victor Torres
+// Maya Awad
+
 /*
 For constants: you must store kind, name and value.
 For variables,: you must store kind, name, L and M.
