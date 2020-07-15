@@ -23,6 +23,17 @@ struct instruct{
 struct instruct Code[MAX_CODE_LENGTH];
 int currentCodeIndex=0;
 int currLevel = 0;
+
+typedef enum {
+    LIT = 1, OPR = 2, LOD = 3, STO = 4, CAL = 5, INC = 6, JMP = 7, JPC = 8,
+    SIO1 = 9, SIO2 = 10, SIO3 = 11
+}opcodes;
+typedef enum{ // for when op=2
+    RET = 0, NEG = 1, ADD = 2, SUB = 3, MUL = 4, DIV = 5, ODD = 6,
+    MOD = 7, EQL = 8, NEQ = 9, LSS = 10, LEQ = 11, GTR = 12, GEQ = 13
+}OPRCodes;
+
+int v=0; // this determines what v is
 // opens the file
 /*
 FILE *openFile(char fileName[], char mode[], FILE *fp)
@@ -143,6 +154,24 @@ void printStack(int stack[], int SP, int BP, FILE *fp)
     }
     //printf("\n");
     fprintf(fp, "\n ");
+}
+
+void printStackCons(int stack[], int SP, int BP)
+{
+    printf("\t");
+    for (int i = MAX_DATA_STACK_HEIGHT-1; i>=SP ; i--)
+    {
+        if (i == BP && (BP != ( MAX_DATA_STACK_HEIGHT-1) ) )
+        {
+            printf("| ");
+            //printf("| ");
+            BP = BP-7; //assumes each Activation Record can hold 6 inputs
+        }
+        printf("%d ", stack[i]);
+        //printf("%d ", stack[i]);
+    }
+    //printf("\n");
+    printf("\n ");
 }
 int vm()
 {
@@ -365,7 +394,7 @@ int vm()
           case 10:
               //printf("case %s\n", interpertOP(IR.OP));
             SP--;
-            scanf("%i", &stack[SP]);
+            scanf("%d", &stack[SP]);
             //printf("\n");
             break;
 
@@ -384,8 +413,13 @@ int vm()
         fprintf(fpw, "\t%3d %3d %4d ", PC, BP, SP);
         printStack(stack, SP, BP, fpw);
 
-    }
+        if (v==1)
+        {
+            printStackCons(stack, SP, BP);
+        }
 
+
+    }
 
 
     return 0;
