@@ -411,9 +411,8 @@ void block()
     emit(INC, 0, 4 + numVars);// TA: "emit(INC, , 4+numVars")
 
     statement();
-    getToken();
+    //getToken();
     printf("end of block statement\n");
-    emit(SIO3, 0, 3); //halt statement
 }
 
 void statement()
@@ -477,13 +476,14 @@ void statement()
                 getToken();
                 // after "begin" must be a statement
                 statement();
+                printf("after the first statement() %d\n", currToken.ID);
             }while( currToken.ID == semicolonsym ); //we can have multiple statements in a row so long as they are separated by semicolons
-            if ( currToken.ID != endsym )
+            if ( currToken.ID != periodsym )
             {
                 error(9); // all these statements must eventually end with "end"
                           // "Incorrect symbol after statement part in block"
             }
-            getToken();
+            //getToken();
             break;
 
         case ifsym:
@@ -601,11 +601,24 @@ void statement()
 
         case endsym:
             printf("in endsym\n");
+            printf("currtoken id: %d\n", currToken.ID);
+            getToken();
+            printf("currtoken id: %d\n", currToken.ID);
+            if (currToken.ID != periodsym)
+            {
+                error(10); // expected a period
+            }
+            if (currToken.ID == periodsym) // yay! the end
+            {
+                emit(SIO3, 0, 3); // emit halt
+                return;
+            }
+            getToken();
             if ( tokenIndex == numTokens )
                 error(10); // period expected
             break;
     }//end of switch
-    statement();
+    //statement();
 
 }//end statement
 
@@ -632,7 +645,8 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
     printf("this print statement is right before it checks if there is a plus or minus. the third time this shows up the current ID should be 4 for plussym.......    currToken.ID: %d\n", currToken.ID);
     while (currToken.ID == plussym || currToken.ID == minussym)
     {
-        getToken();
+        //getToken();
+        printf("^^THIS SHOULD AT LEAST BREAK \n");
         // if the next term is an identifier
         if (currToken.ID == identsym)
         {
@@ -655,7 +669,7 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
 
             // move on
             getToken();
-        }
+        }// end of if
 
 
         // save if its + or - again
@@ -746,7 +760,7 @@ void factor() // ident | number | "(" expression ")"
             error(1); // oh oh it's not an identifier, number, or an expression enclosed in parenthesis
             break;
     }
-    getToken();
+    //getToken();
 
 }
 
