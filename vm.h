@@ -175,7 +175,7 @@ void printStackCons(int stack[], int SP, int BP)
 }
 int vm()
 {
-    printf("\ninside vm.h\n");
+    //printf("\ninside vm.h\n");
     // CPU Register
     int SP = MAX_DATA_STACK_HEIGHT;
     int BP = SP - 1;
@@ -410,16 +410,24 @@ int vm()
 
         //fprintf(fpw, "Initial Values: 0  999  1000");
         fprintf(fpw, "%2d %s %d %d", lastPC, interpertOP(IR.OP), IR.L, IR.M);
+        if (v==1)
+        {
+            printf("%2d %s %d %d", lastPC, interpertOP(IR.OP), IR.L, IR.M);
+        }
         fprintf(fpw, "\t%3d %3d %4d ", PC, BP, SP);
-        printStack(stack, SP, BP, fpw);
+        if (v==1)
+        {
+            fprintf(fpw, "\t%3d %3d %4d ", PC, BP, SP);
+        }
 
+        printStack(stack, SP, BP, fpw);
         if (v==1)
         {
             printStackCons(stack, SP, BP);
         }
 
 
-    }
+    }//end of while
 
 
     return 0;

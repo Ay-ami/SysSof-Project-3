@@ -547,7 +547,6 @@ int lex()
     fclose(fpw);
     //free(tokenStorage);
 
-    printf("\nmade it to the end\n");
 
     return 0;
 }

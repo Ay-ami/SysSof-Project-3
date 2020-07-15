@@ -59,7 +59,7 @@ void emit(int op, int level, int address)
 
         currentCodeIndex++;
     }
-    printf(" emit ( %d, %d, %d )  \n", op, level, address);
+    //printf(" emit ( %d, %d, %d )  \n", op, level, address);
 }
 //---->end of stuff for code generation part of the project<----//
 
@@ -80,7 +80,7 @@ int countTokens()
 }
 void getToken()
 {
-    printf("  getToken() %d\n", currToken.ID);
+    //printf("  getToken() %d\n", currToken.ID);
     if ( tokenIndex == numTokens )
         error(30); // no more tokens to get
     else
@@ -130,8 +130,8 @@ void insertNewSymbol(struct token token, int kind)
         symbolTable[sizeOfSymbolTable].address = currAddress;
                                                               // the reason we don't just start currAddress at 4 is because if we need to access
                                                             // it somewhere else outside of this function it might be 1 address ahead
-        printf("  the inserted var's adress is: %d\n", symbolTable[sizeOfSymbolTable].address);
-        printf("  current address of symbol table is now: %d\n", currAddress);
+        //printf("  the inserted var's adress is: %d\n", symbolTable[sizeOfSymbolTable].address);
+        //printf("  current address of symbol table is now: %d\n", currAddress);
     }
     else
     {
@@ -267,7 +267,7 @@ void block()
     // for some reason block increases current level
     //currLevel++;
 
-    printf("in block\n");
+    //printf("in block\n");
     // all the inputs from HW1 start with Jump to instruction 0
     emit(JMP, 0, 1);
 
@@ -276,7 +276,7 @@ void block()
 
     if ( currToken.ID == constsym )// check for a constant declaration
     {
-        printf("in constsym\n");
+        //printf("in constsym\n");
         do  // we have at lest 1 constant declaration, so do it at lest once
         {
             getToken(); // *if theres a problem around here we, I think could try moving getToken outside of the do/while loop*
@@ -345,7 +345,7 @@ void block()
 
     if ( currToken.ID == varsym ) // check for a variable declaration
     {
-        printf("in varsym\n");
+        //printf("in varsym\n");
         do
         {
             getToken();
@@ -390,12 +390,12 @@ void block()
 
     statement();
     //getToken();
-    printf("end of block statement\n");
+    //printf("end of block statement\n");
 }
 
 void statement()
 {
-    printf("in statement\n");
+    //printf("in statement\n");
 
     // here we use a switch statement instead of a bunch of if statements because the grammar
     // separates types of statements with an OR symbol ("|"). Unlike block() which can enter
@@ -408,7 +408,7 @@ void statement()
     {
         case identsym:; // this semicolon is here because the immediate next line is a declaration which makes it funky for some reason
             // if it is an identifier symbol, check if one with this name exists
-            printf("in identsym (in statement) %s\n", currToken.name);
+            //printf("in identsym (in statement) %s\n", currToken.name);
 
             // check if the identifier has been declared already
             checkedTableIndex = checkTable(currToken);
@@ -448,13 +448,13 @@ void statement()
             break;
 
         case beginsym: // if "begin"
-            printf("in beginsym\n");
+            //printf("in beginsym\n");
             do
             {
                 getToken();
                 // after "begin" must be a statement
                 statement();
-                printf("after the first statement() %d\n", currToken.ID);
+                //printf("after the first statement() %d\n", currToken.ID);
             }while( currToken.ID == semicolonsym ); //we can have multiple statements in a row so long as they are separated by semicolons
             if ( currToken.ID != periodsym )
             {
@@ -465,7 +465,7 @@ void statement()
             break;
 
         case ifsym:
-            printf("in ifsym\n");
+            //printf("in ifsym\n");
             getToken();
             // following "if" we need the condition
             condition();
@@ -499,7 +499,7 @@ void statement()
             break;
 
         case whilesym:
-            printf("in whilesym \n");
+            //printf("in whilesym \n");
             getToken();
             // save jump location for the top
             saveIndex1 = currentCodeIndex;
@@ -521,7 +521,7 @@ void statement()
             break;
 
         case readsym:
-            printf("in readsym\n");
+            //printf("in readsym\n");
             getToken();
 
             // next token must be dentsym
@@ -547,7 +547,7 @@ void statement()
             break;
 
         case writesym:
-            printf("in writesym\n");
+            //printf("in writesym\n");
             getToken();
 
            // next token *must* be identsym
@@ -579,10 +579,10 @@ void statement()
             break;
 
         case endsym:
-            printf("in endsym\n");
-            printf("currtoken id: %d\n", currToken.ID);
+            //printf("in endsym\n");
+            //printf("currtoken id: %d\n", currToken.ID);
             getToken();
-            printf("currtoken id: %d\n", currToken.ID);
+            //printf("currtoken id: %d\n", currToken.ID);
             if (currToken.ID != periodsym)
             {
                 error(10); // expected a period
@@ -603,7 +603,7 @@ void statement()
 
 void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
 {
-    printf("in expression\n");
+    //printf("in expression\n");
     int storeSign = plussym; // you probably don't need to initialize this but I am just in case
     int checkedSymbolTable; // stores the result of checkTable()
 
@@ -621,7 +621,7 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
         term();
 
     // moving on, there can be another +/-
-    printf("this print statement is right before it checks if there is a plus or minus. the third time this shows up the current ID should be 4 for plussym.......    currToken.ID: %d\n", currToken.ID);
+    //printf("this print statement is right before it checks if there is a plus or minus. the third time this shows up the current ID should be 4 for plussym.......    currToken.ID: %d\n", currToken.ID);
     while (currToken.ID == plussym || currToken.ID == minussym)
     {
         //getToken();
@@ -668,7 +668,7 @@ void expression() // expression are ["+" | "-"] term() {("+" | "-") term()}.
 
 void term()
 {
-    printf("in term\n");
+    //printf("in term\n");
     int saveType; // save if it was multiply or divide
     // terms start with a factor
     factor();
@@ -691,14 +691,14 @@ void term()
 
 void factor() // ident | number | "(" expression ")"
 {
-    printf("in factor\n");
+    //printf("in factor\n");
     int ID = currToken.ID;
     int checkedTableIndex;
 
     switch (ID)
     {
         case identsym:
-            printf("in identsym (in factor) %s\n", currToken.name);
+            //printf("in identsym (in factor) %s\n", currToken.name);
 
             checkedTableIndex = checkTable(currToken);
             if (checkedTableIndex == 0) // if a variable identifier with that name doesn't exist, error
@@ -716,13 +716,13 @@ void factor() // ident | number | "(" expression ")"
             break;
 
         case numbersym:
-            printf("in numbersym\n");
+            //printf("in numbersym\n");
             emit(LIT, 0, currToken.value);
             getToken();
             break;
 
         case lparentsym: // this is the "(" expression ")" part
-            printf("in lparentsym\n");
+            //printf("in lparentsym\n");
             getToken();
             expression();
 
@@ -735,7 +735,7 @@ void factor() // ident | number | "(" expression ")"
             break;
 
         default:
-            printf("default switch in factor\n");
+            //printf("default switch in factor\n");
             error(1); // oh oh it's not an identifier, number, or an expression enclosed in parenthesis
             break;
     }
@@ -745,7 +745,7 @@ void factor() // ident | number | "(" expression ")"
 
 void condition()
 {
-    printf("in condition\n");
+    //printf("in condition\n");
     if (currToken.ID == oddsym) // "odd" expression
     {
         getToken();
@@ -827,6 +827,7 @@ void printSymbolTableCons()
 }
 void printCodeArray()
 {
+    printf("\n");
     for (int i = 0; i<currentCodeIndex ; i++)
     {
         /*
@@ -870,10 +871,68 @@ void printLexemeListCons()
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    int l, a;
+    int l = 0, a=0;
     // v is declared as a global in vm.h
+
+
+     if (argc<2)
+    {
+        printf("error : please include file name\n");
+    }
+    if (argc == 5)
+    {
+        l = 1;
+        a = 1;
+        v = 1;
+    }
+    else if (argc == 3)
+    {
+        if (argv[2][1]==a)
+        {
+            a = 1;
+        }
+        else if (argv[2][1]==v)
+        {
+            v=1;
+        }
+        else{
+            l = 1;
+        }
+    }
+    else if (argc == 4)
+    {
+        if (argv[2][1]==a)
+        {
+            a = 1;
+        }
+        else if (argv[2][1]==v)
+        {
+            v=1;
+        }
+        else{
+            l = 1;
+        }
+
+        if (argv[3][1]==a)
+        {
+            a = 1;
+        }
+        else if (argv[3][1]==v)
+        {
+            v=1;
+        }
+        else{
+            l = 1;
+        }
+    }
+
+    /*
+    a = 1;
+    v=1;
+    l =1;
+    */
 
     // step 1: HW2
     lex();
@@ -894,6 +953,17 @@ int main()
     // printStack () is handled inside
     printSymbolTable();
     printLexemeList();
+
+    if (a == 1)
+    {
+        printf("assembly code \n");
+        printCodeArray();
+    }
+
+    if (l == 1)
+    {
+        printLexemeListCons();
+    }
 
 
 }
